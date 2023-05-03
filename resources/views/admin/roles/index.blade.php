@@ -1,65 +1,52 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <div class="bg-white p-4 rounded">
-        @if(session('message'))
-            <div class="alert alert-success">{{ session('message') }}</div>
-        @endif
+    <h1>Ролі користувачів</h1>
+    <p><a href="{{ route('roles.create') }}">Створити нову роль</a></p>
 
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="list-unstyled">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <div class="lead">
-            All roles
+    @if ($message = Session::get('success'))
+        <div class="alert alert-success">
+            <p>{{ $message }}</p>
         </div>
-
-        <div class="container mt-4">
-
-            <table class="table table-striped">
-                <thead>
-                <th scope="col" width="80%">Name</th>
-                <th scope="col" width="10%"></th>
-                <th scope="col" width="1%">
-                    @can('create', Role::class)
-                        <a href="{{ route('roles.create') }}" class="btn btn-primary mb-3">
-
-                        </a>
-                    @endcan
-                </th>
-                </thead>
-
-                @foreach($roles as $role)
-                    <tr>
-                        <td>{{ $role->name }}</td>
-                        <td>
-                            @can('update', $role)
-                                <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-primary mb-3">
-                                </a>
-                            @endcan
-                        </td>
-                        <td>
-                            @can('delete', $role)
-                                <form method="POST" action="{{ route('roles.destroy', $role->id) }}">
-                                    @method('DELETE')
-                                    @csrf
-                                    <button type="submit" class="btn btn-primary mb-3">
-                                       Delete
-                                    </button>
-                                </form>
-                            @endcan
-                        </td>
-                    </tr>
-                @endforeach
-
-            </table>
-
+        @php
+            Session::forget('success');
+        @endphp
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
         </div>
-    </div>
+    @endif
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Назва</th>
+            <th>Дозволи</th>
+            <th>Дії</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach ($roles as $role)
+            <tr>
+                <td>{{ $role->name }}</td>
+                <td>
+                    <ul>
+                        @foreach ($role->permissions as $permission)
+                            <li>{{ $permission->name }}</li>
+                        @endforeach
+                    </ul>
+                </td>
+                <td>
+                    <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-primary">Редагувати</a>
+                    <form action="{{ route('roles.destroy', $role->id) }}" method="POST" style="display: inline-block;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Ви впевнені що хочете видалити цю роль?')" >Видалити</button>
+                    </form>
+                </td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
 @endsection

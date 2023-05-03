@@ -14,4 +14,8 @@ class Category extends Model
         'content',
 
     ];
+    public function posts()
+    {
+        return $this->belongsTo(Post::class);
+    }
 }

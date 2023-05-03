@@ -12,4 +12,12 @@ class CategoryController extends Controller
     {
         return CategoryResourse::collection(Category::all());
     }
+    public function getPostsForCategory(Category $category)
+    {
+        $posts = $category->posts;
+
+        return response()->json([
+            'data' => $posts
+        ]);
+    }
 }

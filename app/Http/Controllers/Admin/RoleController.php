@@ -18,6 +18,7 @@ class RoleController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny',Role::class);
         $roles = Role::query()->get();
         return view('admin.roles.index', compact('roles'));
     }
@@ -36,7 +37,9 @@ class RoleController extends Controller
      */
     public function store(StoreRoleRequest $request)
     {
-        $role = Role::create(['name' => $request->get('name')]);
+        $role = Role::create(['name' => $request->get('name'),
+               'description' => $request->get('description')
+        ]);
         $permissions = collect($request->input('permissions', []))
             ->map(function ($permission) {
                 return ['permission_id' => $permission];
@@ -91,9 +94,12 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
+        if ($role->users()->exists()) {
+            return back()->with('error','Роль не може бути видалена бо є користувачі з цією роллю.');
+        }
         $role->permissions()->detach();
         $role->delete();
         session(['message' => 'Role deleted successfully']);
-        return redirect()->route('roles.index');
+        return redirect()->route('roles.index')->with('success', 'Роль успішно видалена.');
     }
 }

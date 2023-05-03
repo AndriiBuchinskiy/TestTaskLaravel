@@ -23,6 +23,7 @@ class StoreRoleRequest extends FormRequest
     {
         return [
             'name' => 'required|string|min:3|max:255',
+            'description' => 'nullable|max:255'
         ];
     }
 

@@ -16,9 +16,12 @@ class IsAdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+
         if (auth()->check() && in_array(auth()->user()->role_id, [Role::IS_ADMIN, Role::IS_MANAGER])) {
             return $next($request);
         }
+        //$message = 'Ви не маєте відповідних прав доступу.';
+        //return redirect()->back()->with('error', $message);
         abort(403);
     }
 }

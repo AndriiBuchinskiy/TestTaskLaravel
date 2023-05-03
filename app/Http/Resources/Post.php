@@ -21,6 +21,8 @@ class Post extends JsonResource
             'user_id' => $this->user_id,
             'title' => $this->title,
             'content' => $this->content,
+            'img_path' =>$this->img_path,
+
         ];
 
 

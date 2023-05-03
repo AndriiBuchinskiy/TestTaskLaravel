@@ -18,7 +18,7 @@ class CheckIfAdmin
         $user = $request->user();
 
         if (!isset($user)) {
-            return redirect('admin/login');
+            return redirect('/login');
         }
 
         if (!$user->isAdmin()) {

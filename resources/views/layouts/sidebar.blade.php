@@ -16,14 +16,15 @@
 
 <div class="row" style="height: 100vh;">
     <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 260px;">
-        <span class="text-center fs-4">Admin Dashboard</span>
+        <span class="text-center fs-4">Адмін панель</span>
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item"><a class="nav-link" href="{{ route('posts.index') }}">Posts</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('roles.index') }}">Roles</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('categories.index') }}">Categories</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('tags.index') }}">Tags</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">Users</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('posts.index') }}">Пости</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('roles.index') }}">Ролі</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('categories.index') }}">Категорії</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('tags.index') }}">Теги</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">Користувачі</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('comments.index') }}">Коментарі</a></li>
             <hr>
             @guest
                 @if (Route::has('login'))
@@ -59,7 +60,7 @@
             @endguest
             <li class="nav-item">
                 <a class="nav-link mt-4" href="/home">
-                    Home
+                    Головна
                 </a>
             </li>
         </ul>

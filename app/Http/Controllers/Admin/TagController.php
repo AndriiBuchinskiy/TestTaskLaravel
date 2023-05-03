@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tag;
+use App\Requests\StoreTagRequest;
+use App\Requests\UpdateCategoryRequest;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class TagController extends Controller
@@ -18,14 +21,11 @@ class TagController extends Controller
         return view('admin.tags.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreTagRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|max:255|unique:tags,name'
-        ]);
 
         $tag = new Tag();
-        $tag->name = $validated['name'];
+        $tag->name = $request['name'];
         $tag->save();
 
         return redirect()->route('tags.index')->with('success', 'Tag created successfully.');
@@ -36,7 +36,7 @@ class TagController extends Controller
         return view('admin.tags.edit', compact('tag'));
     }
 
-    public function update(Request $request, Tag $tag)
+    public function update(UpdateCategoryRequest $request, Tag $tag)
     {
         $validated = $request->validate([
             'name' => 'required|max:255|unique:tags,name,' . $tag->id
@@ -50,8 +50,15 @@ class TagController extends Controller
 
     public function destroy(Tag $tag)
     {
+        try {
         $tag->delete();
-
-        return redirect()->route('tags.index')->with('success', 'Tag deleted successfully.');
+        return redirect()->route('tags.index')->with('success', 'Тег успішно видалений!');
+    } catch (QueryException $e) {
+        $errorCode = $e->errorInfo[1];
+        if ($errorCode == 1451) {
+            return redirect()->route('tags.index')->with('error', 'Неможливо видалити тег, оскільки він міститься в постах!');
+        }
+        return redirect()->route('tags.index')->with('error', 'Сталася помилка при видаленні тега!');
+    }
     }
 }

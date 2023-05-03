@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
-    protected $table = 'permissions';
+
     protected $guarded = false;
 
+    protected $fillable = [
+        'name',
+        'description',
+    ];
     public function roles() {
-        return $this->belongsToMany(Role::class, 'permission_role', 'permission_id', 'role_id');
+        return $this->belongsToMany(Role::class, 'permission_role');
     }
     /**
      * Связь модели Permission с моделью User, позволяет получить
@@ -19,7 +23,7 @@ class Permission extends Model
      */
     public function users() {
         return $this
-            ->belongsToMany(User::class,'user_permission')
+            ->belongsToMany(User::class,'permission_role')
             ->withTimestamps();
     }
 }

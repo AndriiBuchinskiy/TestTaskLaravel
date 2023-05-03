@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Http\Resources\UserResourse;
+use App\Jobs\SendEmailJob;
 use App\Models\User;
 
 use App\Requests\LoginUserRequest;
@@ -13,97 +13,100 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Str;
 
 class AuthController extends Controller
 {
-    /**
-     * Login
-     *
-     * @param LoginUserRequest $request
-     *
-     * @return array
-     */
-    public function login(LoginUserRequest $request)
+    public function __construct()
     {
-        $data = $request->validated();
-        $login = $data['email'];
-        $password = $data['password'];
-        $deviceName = $data['device_name'];
+        $this->middleware('auth:sanctum')->except('login', 'register');
+    }
 
-        $user = User::where('email', $request->email)->first();
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            'device_name' => 'required'
+        ]);
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
         Auth::login($user);
-        $user->tokens()
-            ->where('name', $deviceName)
-            ->delete();
-        $token = $user->createToken($deviceName)->plainTextToken;
 
-        return [
+        $user->tokens()->where('name', $credentials['device_name'])->delete();
+
+        $token = $user->createToken($credentials['device_name'])->plainTextToken;
+
+        return response([
             'token' => $token,
             'user' => new UserResourse($user),
-        ];
+        ])->withHeaders([
+            "Authorization" => "Bearer $token"
+        ]);
     }
 
-
-    public function register(RegisterRequest $request)
+    public function register(Request $request)
     {
-        $data = $request->validated();
-        $login = $data['email'];
-        $name = $data['name'];
-        $password = $data['password'];
-        $password_confirmation = $data['password_confirmation'];
-        $deviceName = $data['device_name'];
-
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+        $data = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|confirmed|min:8',
+            'device_name' => 'required'
         ]);
 
-        $user->tokens()
-            ->where('name', $deviceName)
-            ->delete();
-        $token = $user->createToken($deviceName)->plainTextToken;
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role_id' => 3,
+        ]);
 
-        return [
+        $user->tokens()->where('name', $data['device_name'])->delete();
+
+        $token = $user->createToken($data['device_name'])->plainTextToken;
+
+        return response([
             'token' => $token,
             'user' => new UserResourse($user),
-        ];
+        ])->withHeaders([
+            "Authorization" => "Bearer $token"
+        ]);
     }
 
-    /**
-     * Logout
-     *
-     * @param Request $request
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function logout(Request $request)
     {
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['message' => 'Logged out']);
-        }
-        $user->tokens()->delete();
+        Auth::user()->tokens()->delete();
+
         Auth::logout();
+
         $request->session()->invalidate();
+
         $request->session()->regenerateToken();
+
         return response()->json(['message' => 'Logged out']);
     }
 
-    public function user()
-    {
-        if (Auth::check()) {
-            return new UserResourse(Auth::user());
-        } else {
-            return response()->json(['error' => 'Unauthenticated.'], 404);
+    public function user(Request $request)
+    { $token = $request->header('Authorization');
+
+        if ($token && Str::startsWith($token, 'Bearer ')) {
+            $token = Str::substr($token, 7);
+
+            if (Auth::guard('sanctum')->check()) {
+                return [
+                    'user' => new UserResourse(Auth::user()),
+                    'x-xsrf-token' => $request->headers->get('x-xsrf-token')
+                ];
+            }
         }
+
+        return response()->json(['error' => 'Unauthenticated.'], 401);
     }
 }

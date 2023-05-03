@@ -15,15 +15,19 @@ return new class extends Migration
             $table->id();
             $table->string('title',20);
             $table->string('content',100);
+            $table->string('img_path')->nullable();
             $table->foreignId('user_id')
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();
-            $table->foreignId('category_id')
-                ->nullable()
-                ->constrained()
-                ->nullOnDelete();
+            $table->unsignedBigInteger('category_id');
+            $table->foreign('category_id')
+                ->references('id')
+                ->on('categories')
+                ->onDelete('restrict');
+
             $table->timestamps();
+
         });
     }
 

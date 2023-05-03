@@ -3,7 +3,19 @@
 @section('content')
     <div class="card">
         <div class="card-header">Коментарі</div>
-
+        @if ($message = Session::get('success'))
+            <div class="alert alert-success">
+                <p>{{ $message }}</p>
+            </div>
+            @php
+                Session::forget('success');
+            @endphp
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
         <div class="card-body">
             <table class="table">
                 <thead>
@@ -23,13 +35,14 @@
                             <form action="{{ route('comments.destroy', $comment->id) }}" method="POST" style="display: inline-block;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger">Видалити</button>
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this comment?')">Видалити</button>
                             </form>
                         </td>
                     </tr>
                 @endforeach
                 </tbody>
             </table>
+            {{ $comments->links('pagination::bootstrap-4') }}
         </div>
     </div>
 @endsection

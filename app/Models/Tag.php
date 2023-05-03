@@ -27,8 +27,8 @@ class Tag extends Model
     {
         static::destroy($id);
     }
-    public function tags()
+    public function posts()
     {
-        return $this->belongsToMany(Tag::class,'post_tag','tag_id','post_id');
+        return $this->hasMany(Post::class, 'id');
     }
 }

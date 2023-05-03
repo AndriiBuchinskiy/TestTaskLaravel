@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Api\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,14 +23,22 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [\App\Http\Controllers\Api\HomeController::class, 'index'])->name('home')->middleware('adminUsers');//-
 Route::redirect('/', '/login');
 
-Route::get('/admin', function () {
-    return view('layouts/sidebar');
+
+Route::middleware(['auth', 'adminUsers'])->prefix('admin')->group(function () {
+    Route::get('/admin', function () {
+        return view('layouts/sidebar');
+    });
+
+
 });
 
-Route::prefix('admin')->middleware('adminUsers')->group( function () {
+
+Route::group([
+    'prefix'=>'admin',
+],function (){
     Route::resources([
         'posts' => PostController::class,
         'roles' => RoleController::class,
@@ -38,6 +47,10 @@ Route::prefix('admin')->middleware('adminUsers')->group( function () {
         'users'=> UserController::class,
         'comments' =>CommentController::class
     ]);
-});
+}
 
 
+);
+
+Route::post('admin/posts',[PostController::class,'store'])->name('posts.store');
+Route::post('uploadImg/{id}',[PostController::class,'uploadImage'])->name('post.image');

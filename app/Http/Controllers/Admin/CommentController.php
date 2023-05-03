@@ -12,7 +12,8 @@ class CommentController extends Controller
 {
     public function index()
     {
-        $comments = Comment::latest()->get();
+
+        $comments = Comment::paginate(10);
         return view('admin.comments.index', compact('comments'));
     }
 
@@ -25,14 +26,22 @@ class CommentController extends Controller
     public function update(Request $request, $id)
     {
         $comment = Comment::findOrFail($id);
-        $comment->update($request->all());
-        return redirect()->route('comments.index');
+
+        $request->validate([
+            'content' => 'required|string|min:3|max:500'
+        ]);
+
+        $comment->content = $request->input('content');
+        $comment->save();
+
+        return redirect()->route('comments.index')->with('success', 'Коментар успішно редагований.');
     }
 
     public function destroy($id)
     {
         $comment = Comment::findOrFail($id);
+
         $comment->delete();
-        return redirect()->route('comments.index');
+        return redirect()->route('comments.index')->with('success', 'Коментар успішно видалений.');
     }
 }

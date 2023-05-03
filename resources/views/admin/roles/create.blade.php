@@ -1,56 +1,34 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <div class="bg-white p-4 rounded">
-        <div class="lead">
-            Add new role and assign permissions
-        </div>
+    <h1>Create new role</h1>
 
-        <div class="container mt-4">
+    @if (count($permissions) > 0)
+        <form action="{{ route('roles.store') }}" method="POST">
+            @csrf
 
-            <form method="POST" action="{{ route('roles.store') }}">
-                @csrf
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input value="{{ old('name') }}"
-                           type="text"
-                           class="form-control shadow-none"
-                           name="name"
-                           placeholder="Name" required>
-                </div>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea class="form-control" id="description" name="description">{{ old('description') }}</textarea>
+            </div>
 
-                @error('name')
-                <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
+            <div class="form-group">
+                <label for="permissions[]">Permissions:</label>
+                <br>
+                @foreach ($permissions as $permission)
+                    <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"> {{ $permission->name }}<br>
+                @endforeach
+            </div>
 
-                <label for="permissions" class="form-label">Assign Permissions</label>
-
-                <table class="table table-striped">
-                    <thead>
-                    <th scope="col" width="1%"><input type="checkbox" id="checkAll" name="all_permissions"></th>
-                    <th scope="col" width="20%">Name</th>
-                    </thead>
-
-                    @foreach($permissions as $permission)
-                        <tr>
-                            <td>
-                                <input type="checkbox"
-                                       name="permissions[{{ $permission->id}}]"
-                                       value="{{ $permission->id }}"
-                                       class='permission'>
-                            </td>
-                            <td>{{ $permission->description }}</td>
-                        </tr>
-                    @endforeach
-
-                </table>
-
-                <button type="submit" class="btn btn-primary">Save role</button>
-                <button type="button" href="{{ route('roles.index') }}" class="btn btn-outline-secondary shadow-none">Back</button>
-            </form>
-        </div>
-
-    </div>
+            <button type="submit" class="btn btn-primary">Create role</button>
+        </form>
+    @else
+        <p>No permissions found. Please create some permissions first.</p>
+    @endif
 @endsection
 
 @push('scripts')

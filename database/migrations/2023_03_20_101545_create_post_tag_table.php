@@ -15,10 +15,10 @@ return new class extends Migration
                $table->id();
                $table->unsignedBigInteger('post_id');
                $table->unsignedBigInteger('tag_id');
-               $table->index('post_id','post_tag_post_idx');
-               $table->index('tag_id','post_tag_tag_idx');
-               $table->foreign('post_id','post_tag_post_fk')->on('posts')->references('id')->onDelete('cascade');
-               $table->foreign('tag_id','post_tag_tag_fk')->on('tags')->references('id')->onDelete('cascade');
+               $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
+            // Додано зовнішній ключ на колонку 'tag_id' таблиці 'tags' з обмеженням 'restrict'
+               $table->foreign('tag_id')->references('id')->on('tags')->onDelete('restrict')->onUpdate('cascade');
+
                $table->timestamps();
         });
     }

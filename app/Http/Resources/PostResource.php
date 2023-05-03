@@ -14,12 +14,18 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request)
     {
+
+        $imagePath = $this->img_path ? asset('storage/app/'.$this->img_path) : null;
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
             'title' => $this->title,
             'content' => $this->content,
-            'comments' => CommentResource::collection($this->whenLoaded('comments'))
+            'img_path' => $imagePath,
+            'name' =>$this->user->name,
+            'category_id' => $this->category_id,
+            'category_name' => $this->categories->name,
+            'tag_name' => array_unique($this->tags->pluck('name')->toArray()),
         ];
     }
 

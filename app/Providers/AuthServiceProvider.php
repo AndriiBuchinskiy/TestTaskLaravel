@@ -2,7 +2,19 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+//use Illuminate\Support\Facades\Gate;
+use App\Models\Category;
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\Role;
+use App\Models\Tag;
+use App\Models\User;
+use App\Policies\CategoryPolicy;
+use App\Policies\CommentPolicy;
+use App\Policies\PostPolicy;
+use App\Policies\RolePolicy;
+use App\Policies\TagPolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -14,6 +26,12 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        Comment::class => CommentPolicy::class,
+        Post::class => PostPolicy::class,
+        Role::class => RolePolicy::class,
+        Category::class => CategoryPolicy::class,
+        Tag::class => TagPolicy::class,
+        User::class => UserPolicy::class,
     ];
 
     /**
@@ -21,6 +39,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+       $this->registerPolicies();
     }
 }

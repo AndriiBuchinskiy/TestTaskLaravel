@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
 {
+    protected $redirectTo = '/dashboard';
     public function authorize(): bool
     {
         return true;

@@ -9,6 +9,7 @@ class LoginUserRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
+    protected $redirectTo = '/dashboard';
     public function authorize(): bool
     {
         return true;

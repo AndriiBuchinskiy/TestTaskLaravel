@@ -1,54 +1,62 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <div class="bg-white p-4 rounded">
-        <div class="lead">
-            Edit role
-        </div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">{{ __('Edit Role') }}</div>
 
-        <div class="container mt-4">
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('roles.update', $role->id) }}">
+                            @csrf
+                            @method('PUT')
 
-            <form method="POST" action="{{ route('roles.update', $role->id) }}">
-                @method('PUT')
-                @csrf
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input value="{{ old('name', $role->name) }}"
-                           type="text"
-                           class="form-control shadow-none @error('name') is-invalid @enderror"
-                           name="name"
-                           placeholder="Name" required>
+                            <div class="form-group row">
+                                <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Name') }}</label>
+
+                                <div class="col-md-6">
+                                    <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ $role->name }}" required autocomplete="name" autofocus>
+
+                                    @error('name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="permissions" class="col-md-4 col-form-label text-md-right">{{ __('Permissions') }}</label>
+
+                                <div class="col-md-6">
+                                    @foreach($permissions as $permission)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="permissions[]" value="{{ $permission->id }}" id="{{ $permission->id }}" class="form-check-input" @if(in_array($permission->id, $checkedPermissions)) checked @endif>
+                                            <label for="{{ $permission->id }}" class="form-check-label">{{ $permission->name }}</label>
+                                        </div>
+                                    @endforeach
+
+                                    @error('permissions')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="form-group row mb-0">
+                                <div class="col-md-6 offset-md-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        {{ __('Update') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                @error('name')
-                <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
-
-                <table class="table table-striped">
-                    <thead>
-                    <th scope="col" width="1%"><input type="checkbox" name="all_permission" id="checkAll"></th>
-                    <th scope="col" width="20%">Name</th>
-                    </thead>
-
-                    @foreach($permissions as $permission)
-                        <tr>
-                            <td>
-                                <input type="checkbox"
-                                       name="permissions[{{ $permission->id }}]"
-                                       value="{{ $permission->id }}"
-                                       class="permission"
-                                        {{ (in_array($permission->id, $checkedPermissions) ? 'checked' : '')}}>
-                            </td>
-                            <td>{{ $permission->description }}</td>
-                        </tr>
-                    @endforeach
-
-                </table>
-
-                <button type="submit" class="btn btn-primary mb-3">Update role</button>
-                <a href="{{ route('roles.index') }}" class="btn btn-primary mb-3">Back</a>
-            </form>
+            </div>
         </div>
-
     </div>
 @endsection
 

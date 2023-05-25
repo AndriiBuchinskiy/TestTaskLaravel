@@ -9,10 +9,8 @@ class Category extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'parent_id',
+        'id',
         'name',
-        'content',
-
     ];
     public function posts()
     {

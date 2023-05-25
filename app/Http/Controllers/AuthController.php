@@ -71,7 +71,7 @@ class AuthController extends Controller
         $user->tokens()->where('name', $data['device_name'])->delete();
 
         $token = $user->createToken($data['device_name'])->plainTextToken;
-
+        SendEmailJob::dispatch($data['email']);
         return response([
             'token' => $token,
             'user' => new UserResourse($user),
@@ -82,6 +82,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+
         Auth::user()->tokens()->delete();
 
         Auth::logout();

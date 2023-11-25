@@ -82,24 +82,23 @@ class UserController extends Controller
         ]);
 
         if ($request->hasFile('avatar')) {
-            $avatarPath = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $avatarPath;
-        } else {
+            $file = $request->file('avatar');
 
+
+            $fileName = time() . '_' . $file->getClientOriginalName();
+
+
+            $filePath = $file->storeAs('avatars', $fileName, 'public');
+
+
+            $user->avatar = $fileName;
+        } else {
             $user->avatar = 'placeholder.jpg';
         }
 
         $user->save();
 
-        if (!isset($validatedData['products_id']))
-        {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['product_id' => 'One or more selected products do not exist.']);
-        }
 
-        $user->products()->attach($validatedData['products_id']);
-        event(new UpdateUserAmount($user));
 
         return redirect()->route('users.index')
             ->with('success', 'User created successfully');

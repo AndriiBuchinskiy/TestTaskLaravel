@@ -30,7 +30,7 @@ class CreateUserRequest extends FormRequest
                 'array',
                 Rule::exists('products', 'id'),
             ],
-            'avatar' => 'nullable|image|max:10240',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ];
     }
 }

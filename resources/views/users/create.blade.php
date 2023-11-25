@@ -6,7 +6,7 @@
 <body>
 <h1>Create User</h1>
 <a href="{{ route('users.index') }}">Users</a>
-<form action="{{ route('users.store') }}" method="post">
+<form action="{{ route('users.store') }}" method="post" enctype="multipart/form-data">
     @csrf
 
     <label for="first_name">Title:</label>

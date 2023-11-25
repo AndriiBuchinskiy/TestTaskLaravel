@@ -6,7 +6,7 @@
 <body>
 <h1>Edit User</h1>
 <a href="{{ route('users.index') }}">Users</a>
-<form action="{{ route('users.update', ['user' => $user->id]) }}" method="post">
+<form action="{{ route('users.update', ['user' => $userWithProducts->id]) }}" method="post">
     @csrf
     @method('PUT')
 

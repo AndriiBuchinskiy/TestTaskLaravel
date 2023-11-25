@@ -13,8 +13,10 @@ use App\Policies\CategoryPolicy;
 use App\Policies\CommentPolicy;
 use App\Policies\PostPolicy;
 use App\Policies\RolePolicy;
+use App\Policies\SubtaskPolicy;
 use App\Policies\TagPolicy;
 use App\Policies\UserPolicy;
+use App\Subtask;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -32,6 +34,7 @@ class AuthServiceProvider extends ServiceProvider
         Category::class => CategoryPolicy::class,
         Tag::class => TagPolicy::class,
         User::class => UserPolicy::class,
+        Subtask::class => SubtaskPolicy::class,
     ];
 
     /**

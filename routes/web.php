@@ -1,13 +1,10 @@
 <?php
 
 
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\CommentController;
-use App\Http\Controllers\Admin\PostController;
-use App\Http\Controllers\Admin\RoleController;
-use App\Http\Controllers\Admin\TagController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Api\HomeController;
+
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,37 +17,8 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::redirect('/', '/users');
 
-Auth::routes();
+Route::resource('users',UserController::class);
+Route::resource('products',ProductController::class);
 
-Route::get('/home', [\App\Http\Controllers\Api\HomeController::class, 'index'])->name('home')->middleware('adminUsers');//-
-Route::redirect('/', '/login');
-
-
-Route::middleware(['auth', 'adminUsers'])->prefix('admin')->group(function () {
-    Route::get('/admin', function () {
-        return view('layouts/sidebar');
-    });
-
-
-});
-
-
-Route::group([
-    'prefix'=>'admin',
-],function (){
-    Route::resources([
-        'posts' => PostController::class,
-        'roles' => RoleController::class,
-        'categories' =>CategoryController::class,
-        'tags' => TagController::class,
-        'users'=> UserController::class,
-        'comments' =>CommentController::class
-    ]);
-}
-
-
-);
-
-Route::post('admin/posts',[PostController::class,'store'])->name('posts.store');
-Route::post('uploadImg/{id}',[PostController::class,'uploadImage'])->name('post.image');

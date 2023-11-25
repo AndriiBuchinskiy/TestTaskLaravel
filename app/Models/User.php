@@ -2,62 +2,22 @@
 
 namespace App\Models;
 
-namespace App\Models;
-
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Traits\HasRolesAndPermissions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens; // ADD THIS
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
+class User extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    use HasFactory;
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role_id'
+        'first_name',
+        'last_name',
+        'amount',
+        'avatar',
     ];
+    public $timestamps = false;
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    public function role()
+    public function products()
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsToMany(Product::class,'user_products');
     }
-    public function hasPermission($permission):bool
-    {
-        return $this->role->permissions->contains('name', $permission);
-    }
-
-    public function isAdmin()
-    {
-        return $this->role->name == 'root';
-    }
-
 }

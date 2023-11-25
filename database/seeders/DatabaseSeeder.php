@@ -4,8 +4,9 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-use App\Models\Post;
-use Database\Factories\RoleFactory;
+
+use App\Events\UpdateUserAmount;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -16,18 +17,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleTableSeeder::class,
-            UserTableSeeder::class,
-            CategoryTableSeeder::class,
-            PostTableSeeder::class,
-            TagTableSeeder::class,
-            CommentTableSeeder::class,
-            PermissionsTableSeeder::class,
-            PostTagTableSeeder::class
-
-
-
+            UserSeeder::class,
+            ProductSeeder::class,
+            UserProductSeeder::class,
         ]);
+
+        $users = User::all();
+        foreach ($users as $user) {
+            event(new UpdateUserAmount($user));
+        }
 
     }
 }

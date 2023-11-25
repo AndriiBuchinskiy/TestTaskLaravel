@@ -31,7 +31,7 @@
             <option value="{{ $product->id }}">{{ $product->title }}</option>
         @endforeach
     </select>
-    @error('product_id')
+    @error('products_id')
     <div class="alert alert-danger">{{ $message }}</div>
     @enderror
     <br>

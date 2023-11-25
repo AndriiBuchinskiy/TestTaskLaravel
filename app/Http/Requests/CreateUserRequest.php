@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateUserRequest extends FormRequest
 {
@@ -24,7 +25,11 @@ class CreateUserRequest extends FormRequest
         return [
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'products_id' => 'nullable|array',
+            'products_id' => [
+                'nullable',
+                'array',
+                Rule::exists('products', 'id'),
+            ],
             'avatar' => 'nullable|image|max:10240',
         ];
     }

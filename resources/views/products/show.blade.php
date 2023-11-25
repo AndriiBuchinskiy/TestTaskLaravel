@@ -4,8 +4,9 @@
     <title>{{ $productWithUsers->title }}</title>
 </head>
 <body>
-<h1>{{ $productWithUsers->title }}</h1>
+<h1>Information product</h1>
 <p>ID: {{ $productWithUsers->id }}</p>
+<p>Title: {{ $productWithUsers->title }}</p>
 <p>Description: {{ $productWithUsers->description }}</p>
 <p>Price: {{ $productWithUsers->price }}</p>
 

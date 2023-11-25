@@ -7,6 +7,7 @@ use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 
 class UserController extends Controller
@@ -39,18 +40,31 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, $id)
     {
 
-        $user = User::findOrFail($id);
+            $user = User::findOrFail($id);
 
-        $user->update([
-            'first_name' => $request->input('first_name'),
-            'last_name' => $request->input('last_name'),
-        ]);
+            $user->update([
+                'first_name' => $request->input('first_name'),
+                'last_name' => $request->input('last_name'),
+            ]);
+
+            $productIds = $request->input('product_id', []);
 
 
-        $user->products()->sync($request->input('product_id', []));
-        event(new UpdateUserAmount($user));
-        return redirect()->route('products.index')
-            ->with('success', 'Product updated successfully');
+            $existingProductIds = Product::whereIn('id', $productIds)->pluck('id')->toArray();
+            $nonExistingProductIds = array_diff($productIds, $existingProductIds);
+
+            if (!empty($nonExistingProductIds)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['product_id' => 'One or more selected products do not exist.']);
+            }
+
+            $user->products()->sync($existingProductIds);
+            event(new UpdateUserAmount($user));
+
+            return redirect()->route('users.index')
+                ->with('success', 'Users updated successfully');
+
     }
 
     public function create()
@@ -77,10 +91,14 @@ class UserController extends Controller
 
         $user->save();
 
-        if (isset($validatedData['products_id']))
+        if (!isset($validatedData['products_id']))
         {
-            $user->products()->attach($validatedData['products_id']);
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['product_id' => 'One or more selected products do not exist.']);
         }
+
+        $user->products()->attach($validatedData['products_id']);
         event(new UpdateUserAmount($user));
 
         return redirect()->route('users.index')

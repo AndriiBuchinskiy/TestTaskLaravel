@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -25,7 +26,12 @@ class UpdateProductRequest extends FormRequest
             'title' => 'required|string',
             'description' => 'nullable|string',
             'price' => 'required|numeric',
-            'users_id' => 'nullable|array',
+            'users_id' => [
+                'nullable',
+                'array',
+                Rule::exists('users', 'id'),
+            ],
         ];
     }
+
 }

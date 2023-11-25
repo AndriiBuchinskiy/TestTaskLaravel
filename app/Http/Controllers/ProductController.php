@@ -37,9 +37,13 @@ class ProductController extends Controller
             'description' => $validatedData['description'],
             'price' => $validatedData['price']
         ]);
-        if (isset($validatedData['users_id'])) {
-            $product->users()->attach($validatedData['users_id']);
+        if (!isset($validatedData['users_id'])) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['users_id' => 'One or more selected users do not exist.']);
+
         }
+        $product->users()->attach($validatedData['users_id']);
         return redirect()->route('products.index')
             ->with('success', 'Product created successfully');
     }
@@ -64,6 +68,16 @@ class ProductController extends Controller
             'price' => $request->input('price'),
         ]);
 
+        $userIds= $request->input('users_id',[]);
+
+        $existingUsersIds = User::whereIn('id', $userIds)->pluck('id')->toArray();
+        $nonExistingProductIds = array_diff($userIds, $existingUsersIds);
+
+        if (!empty($nonExistingProductIds)) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['product_id' => 'One or more selected products do not exist.']);
+        }
 
         $product->users()->sync($request->input('users_id', []));
 

@@ -4,8 +4,10 @@
     <title>{{ $userWithProducts->first_name }} {{ $userWithProducts->last_name }}</title>
 </head>
 <body>
-<h1>{{ $userWithProducts->first_name }} {{ $userWithProducts->last_name }}</h1>
+<h1>Information User</h1>
 <p>ID: {{ $userWithProducts->id }}</p>
+<p>First name: {{ $userWithProducts->first_name }}</p>
+<p>Last name: {{ $userWithProducts->last_name }}</p>
 <p>Amount: {{ $userWithProducts->amount }}</p>
 <p>Avatar: {{ $userWithProducts->avatar }}</p>
 

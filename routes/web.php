@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::redirect('/', '/users');
+Route::get('/', function () {
+    return redirect()->route('users.index');
+});
 
 Route::resource('users',UserController::class);
 Route::resource('products',ProductController::class);

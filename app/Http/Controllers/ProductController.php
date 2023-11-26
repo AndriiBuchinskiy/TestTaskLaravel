@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UpdateUserAmount;
 use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
@@ -32,18 +33,32 @@ class ProductController extends Controller
     {
         $validatedData = $request->validated();
 
-        $product = Product::create([
-            'title' => $validatedData['title'],
-            'description' => $validatedData['description'],
-            'price' => $validatedData['price']
-        ]);
-        if (!isset($validatedData['users_id'])) {
+
+        if (empty($validatedData['users_id'])) {
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['users_id' => 'One or more selected users do not exist.']);
-
         }
-        $product->users()->attach($validatedData['users_id']);
+
+        // Validate that all provided user IDs exist in the database
+        $existingUserIds = User::whereIn('id', $validatedData['users_id'])->pluck('id')->toArray();
+
+        if (count($validatedData['users_id']) !== count($existingUserIds)) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['users_id' => 'One or more selected users do not exist.']);
+        }
+
+
+        $product = Product::create([
+            'title' => $validatedData['title'],
+            'description' => $validatedData['description'],
+            'price' => $validatedData['price'],
+        ]);
+
+
+        $product->users()->attach($existingUserIds);
+
         return redirect()->route('products.index')
             ->with('success', 'Product created successfully');
     }
@@ -71,9 +86,9 @@ class ProductController extends Controller
         $userIds= $request->input('users_id',[]);
 
         $existingUsersIds = User::whereIn('id', $userIds)->pluck('id')->toArray();
-        $nonExistingProductIds = array_diff($userIds, $existingUsersIds);
+        $nonExistingUsersIds = array_diff($userIds, $existingUsersIds);
 
-        if (!empty($nonExistingProductIds)) {
+        if (!empty($nonExistingUsersIds)) {
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['product_id' => 'One or more selected products do not exist.']);

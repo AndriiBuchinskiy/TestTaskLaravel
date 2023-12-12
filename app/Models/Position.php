@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Position extends Model
+{
+    use HasFactory;
+
+    public $timestamps = false;
+
+    public function positions()
+    {
+        return $this->belongsTo(User::class,'position_id');
+    }
+}

@@ -9,15 +9,18 @@ class User extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'amount',
-        'avatar',
+        'name',
+        'email',
+        'phone',
+        'position',
+        'position_id',
+        'photo',
     ];
+
     public $timestamps = false;
 
-    public function products()
+    public function position()
     {
-        return $this->belongsToMany(Product::class,'user_products');
+        return $this->belongsTo(Position::class,'positions');
     }
 }

@@ -2,8 +2,6 @@
 <html>
 <head>
     <title>Users</title>
-    <a href="{{ route('products.index') }}">Products</a>
-    <a href="{{ route('users.create') }}">Create new user</a>
     <style>
         table {
             border-collapse: collapse;
@@ -23,48 +21,43 @@
 </head>
 <body>
 <h1>Users</h1>
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
-<table>
-    <thead>
-    <tr>
-        <th>Id</th>
-        <th>First Name Last Name</th>
-        <th>Products</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach ($users as $user)
+<a href="{{ route('users.create') }}">Create User</a>
+@if(request()->expectsJson())
+    <ul>
+        @foreach ($userResourceCollection as $user)
+            <li>{{ $user->id }} - {{ $user->name }} - {{ $user->email }}</li>
+        @endforeach
+    </ul>
+    {{ $userResourceCollection->links() }}
+@else
+    <table>
+        <thead>
         <tr>
-            <td>{{$user->id}}</td>
-            <td>
-                <a href="{{ route('users.show', ['user' => $user->id]) }}">{{ $user->first_name }} {{ $user->last_name }}</a>
-            </td>
-            <td>
-                <ul>
-                    @foreach ($user->products as $product)
-                        <li>{{ $product->id }} - {{ $product->title }} - {{ $product->description }}</li>
-                    @endforeach
-                </ul>
-            </td>
-            <td>
-                <form action="{{ route('users.edit', ['user' => $user->id]) }}" method="get">
-                    @csrf
-                    <button type="submit">Edit</button>
-                </form>
-                <form action="{{ route('users.destroy', ['user' => $user->id]) }}" method="post">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
-                </form>
-            </td>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Position</th>
+            <th>Registration Timestamp</th>
+            <th>Photo</th>
         </tr>
-    @endforeach
-    </tbody>
-</table>
+
+        </thead>
+        <tbody>
+        @foreach ($userResourceCollection as $user)
+            <tr>
+                <td>{{ $user->id }}</td>
+                <td><a href="{{ route('users.show', ['user' => $user->id]) }}">{{ $user->name }}</a></td>
+                <td>{{ $user->email }}</td>
+                <td>{{ $user->phone }}</td>
+                <td>{{ $user->position }}</td>
+                <td>{{ $user->registration_timestamp }}</td>
+                <td><img src="{{ $user->photo }}" alt=" Photo" width="50"></td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
+    {{ $userResourceCollection->links() }}
+@endif
 </body>
 </html>

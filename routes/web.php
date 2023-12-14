@@ -1,10 +1,10 @@
 <?php
 
 
-
-
+use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
+use App\Models\Position;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,5 +22,5 @@ Route::get('/', function () {
 });
 
 Route::resource('users',UserController::class);
-Route::resource('products',ProductController::class);
+Route::get('positions',[PositionController::class,'index'])->name('positions.index');
 

@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 
 use App\Events\UpdateUserAmount;
+use App\Models\Position;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -17,15 +18,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            UserSeeder::class,
-            ProductSeeder::class,
-            UserProductSeeder::class,
+            PositionSeeder::class,
+            UserSeeder::class
         ]);
-
-        $users = User::all();
-        foreach ($users as $user) {
-            event(new UpdateUserAmount($user));
-        }
 
     }
 }

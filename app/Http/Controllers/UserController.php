@@ -2,29 +2,66 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\UpdateUserAmount;
+
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
-use App\Models\Product;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 
 class UserController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('products')->get();
-        return view('users.index', compact('users'));
 
+        $validator = Validator::make($request->all(), [
+            'page' => 'integer|min:1',
+            'count' => 'integer|min:1',
+        ]);
+
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'fails' => $validator->errors(),
+            ], 422);
+        }
+
+        $page = $request->input('page', 1);
+        $count = $request->input('count', 5);
+
+        $users = User::orderByDesc('registration_timestamp')
+            ->paginate($count, ['*'], 'page', $page);
+
+
+        if ($page > $users->lastPage()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Page not found',
+            ], 404);
+        }
+
+        $userResourceCollection = UserResource::collection($users);
+
+
+        return view('users.index', compact('userResourceCollection'));
     }
 
-    public function show(User $user)
+
+    public function show($id)
     {
 
-        $userWithProducts = User::with('products')->find($user->id);
-        return view('users.show', compact('userWithProducts'));
+         try {
+                $user = User::findOrFail($id);
+        return view('users.show', compact('user'));
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
     }
 
     public function edit($id)
@@ -69,8 +106,8 @@ class UserController extends Controller
 
     public function create()
     {
-        $products = Product::all();
-        return view('users.create',compact('products'));
+
+        return view('users.create');
     }
 
     public function store(CreateUserRequest $request)
